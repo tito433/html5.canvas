@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Using JS OOP</title>
+  <style>
+  	#canvas{
+  		position: relative;
+  		width: 400px;height: 300px;
+  		margin: 20px auto;
+  		border:1px solid red;
+  	}
+  </style>
+</head>
+<body>
+	<div id="canvas"></div>
+  <script src="../dist/canvas.min.js"></script>
+  <script>
+  	function TimeNow(){
+	    Drawable.call(this);
+	    this.draw=function(ctx){
+	        ctx.beginPath();
+	        ctx.font="13px Verdana";
+	        ctx.textAlign = "center";
+	        ctx.textBaseline = 'middle';
+	        ctx.fillText(new Date,this.x,this.y);
+	    }
+
+	}
+	TimeNow.prototype = Object.create(Drawable.prototype);
+	TimeNow.prototype.constructor = TimeNow;
+
+
+	window.onload =function(){
+	    new Canvas(document.getElementById('canvas')).addDrawable(new TimeNow().position(200,150));
+	}
+  </script>
+</body>
+</html>
