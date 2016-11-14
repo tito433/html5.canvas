@@ -1,0 +1,6 @@
+{
+  "name": "Html5.canvas",
+  "tagline": "Drawing library for html5 canvas",
+  "body": "# HTML5 Canvas javascript Lib.\r\nThis javascript library will provide you a glimpse of JavaScript OOP concept. You start by extending Canvas Ojbect.\r\n\r\n```\r\nvar domElem='#output' || document.querySelector('#output canvas') || document.body\r\nvar canvas=new Canvas(domElem);\r\n```\r\nIn this point you've a canvas reference in browser, where you can perform:\r\n\r\n* add=function(drObject) to add in canvas.\r\n* rem=function(drObject) to delete from canvas.\r\n* clear=function() to clean canvas.\r\n* draw=function() to show items in canvas, draw once\r\n* animate=function(interval) to show items in canvas, draw infinte times per 1000ms,1000/60 is default and false is to stop.",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
