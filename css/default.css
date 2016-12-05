@@ -106,7 +106,7 @@ fieldset buttongroup button{
 }
 
 .list {text-align: left;margin: 0;padding: 0;list-style: none;}
-.list li {margin-bottom: 10px;display: block;}
+.list li {margin-bottom: 10px;display: block;overflow: hidden;}
 .list li p{margin: 0px;display: inline-block;}
 .list li label,.list li div{float: right;}
 .input-group{
@@ -178,6 +178,7 @@ fieldset buttongroup button{
   background: #fff;
   content: "";
   border-radius: 1em;
+  top: 0;left: 0;
 }
 .tgl + label:after{
   position: relative;
