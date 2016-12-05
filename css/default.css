@@ -4,63 +4,64 @@ html,body{
   color: #444;
   box-sizing: border-box;
 }
-body{padding: 10px;}
+body{padding: 10px;position: relative;}
 header{
   width: 300px;
-  margin: 0;
-  padding: 0 10px;
-  background-color: rgba(240, 240, 240,0.7);
   max-height: 100%;
   overflow: hidden;
   position: absolute;
-  left: 0;top: 0;
+  left: 0px;
+  top: 0px;
+  bottom: 0
 }
 header h1{
   text-align: center;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  line-height: 20px;
 }
 
-#menu{
-    background: #444;
-    color: #ccc;
-}
-#menu .nav-trigger{
-  opacity: 0;
-}
-#menu .nav-trigger,#menu .nav-trigger+label{
+header .nav-toggle{opacity: 0;}
+header .nav-toggle,header input+label{
   position: absolute;
-  top: 27px;
+  top: 10px;
   width: 30px;
   height: 25px;
   cursor: pointer;
   margin: 0;
+  left: 10px;
 }
 
-#menu .nav-trigger+label span, 
-#menu .nav-trigger+label span:before,
-#menu .nav-trigger+label span:after {
+header .nav-toggle+label span, 
+header .nav-toggle+label span:before,
+header .nav-toggle+label span:after {
   cursor: pointer;
   border-radius: 1px;
   height: 5px;
   width: 100%;
-  background: #444;
+  background: #000;
   position: absolute;
   display: block;
   content: '';
 }
-#menu .nav-trigger+label span:before {
+header .nav-toggle+label span:before {
   top: 10px;
 }
-#menu .nav-trigger+label span:after {
+header .nav-toggle+label span:after {
   bottom: -20px; 
 }
 
-#menu nav{
+#menu{
   height: 0;
-  transition: height 0.5s ease;
+  transition: all 0.5s ease;
   overflow: hidden;
+  background: #444;
+  color: #ccc;
+  margin: 0;
 }
-#menu input:checked  ~ nav{
-  height: 1500px;
+#nav-toggle:checked ~ #menu{
+  height: 100%;
+  padding: 10px;
 }
 
 #menu nav ul{
