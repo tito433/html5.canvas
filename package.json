@@ -1,0 +1,26 @@
+{
+  "name": "html5.canvas",
+  "version": "2.0.0",
+  "description": "Canvas drawing with default theme",
+  "main": "index.html",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "testMe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tito433/html5.canvas.git"
+  },
+  "keywords": [
+    "canvas",
+    "drawing"
+  ],
+  "author": "Tito <titosust@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tito433/html5.canvas/issues"
+  },
+  "homepage": "https://github.com/tito433/html5.canvas#readme"
+}

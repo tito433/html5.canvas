@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Geometry</title>
+  <style>
+  	html,body{
+  		padding: 0;margin: 0;
+  		height: 100%;width: 100%;
+  		overflow: hidden;
+  	}
+  </style>
+</head>
+<body>
+  <script src="../dist/canvas.min.js"></script>
+  <script>
+  	function App(){
+	    var canvas=new Canvas(),
+	    	centerX=canvas.width/2,
+	    	centerY=canvas.height/2;
+	    var area=100*200;
+
+	    var triangle=new Triangle();
+	    canvas.addDrawable(triangle.position(centerX,centerY+100));
+	    triangle.area(area/3);
+	    var rectangle=new Rectangle();
+	    canvas.addDrawable(rectangle.position(centerX,centerY));
+	    
+	    var triangle1=new Triangle();
+	    canvas.addDrawable(triangle1.position(centerX,centerY));
+	    triangle1.lte=0;
+	    triangle1.area(area/3);
+	    
+	}
+
+	function Triangle(){
+		Drawable.call(this);
+
+		this.h=100;
+		this.b=200;
+		this.lte=1;
+		this.draw=function(ctx){
+	        ctx.beginPath();
+			ctx.moveTo(this.x, this.y);
+			if(this.lte==1){
+				ctx.lineTo(this.x+this.b,this.y);
+				ctx.lineTo(this.x+this.b,this.y-this.h);
+			}else if(this.lte==0){
+				ctx.lineTo(this.x,this.y+this.h);
+				ctx.lineTo(this.x+this.b,this.y+this.h);
+			}
+			ctx.closePath();
+			// the outline
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = '#ff0000';
+			ctx.stroke();
+	    }
+	    this.area=function(ar){
+	    	if(undefined==ar){
+	    		return this.h*this.b;
+	    	}else{
+	    		if(this.lte==1){
+					this.h=(2*ar)/this.b;
+				}else if(this.lte==0){
+					this.b=(2*ar)/this.h;
+				}
+	    		
+	    		return this;
+	    	}
+	    }
+
+	}
+	Triangle.prototype = Object.create(Drawable.prototype);
+	Triangle.prototype.constructor = Triangle;
+
+	function Rectangle(){
+		Drawable.call(this);
+
+		this.h=100;
+		this.b=200;
+		this.label=this.h*this.b;
+
+		this.draw=function(ctx){
+	        ctx.beginPath();
+	        var x=this.x,
+	        	y=this.y;
+
+	        ctx.lineWidth = 2;
+			ctx.strokeStyle = '#666666';
+			ctx.rect(x,y,this.b,this.h);
+			ctx.stroke();
+			//print area
+			ctx.font=this.font;
+	        ctx.textAlign = "center";
+	        ctx.textBaseline = 'middle';
+	        ctx.fillText(this.label,this.x+this.b/2,this.y+this.h/2);
+
+			
+	    }
+
+	}
+	Rectangle.prototype = Object.create(Drawable.prototype);
+	Rectangle.prototype.constructor = Rectangle;
+
+	window.onload =function(){
+		new App();
+	}
+  </script>
+</body>
+</html>
