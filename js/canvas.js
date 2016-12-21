@@ -210,6 +210,11 @@ Drawable.prototype.draw=function(ctx){
     }
 
 }
+function Point(x,y){
+    this.x=x;
+    this.y=y;
+}
+
 function Line(){
     Drawable.call(this);
 
@@ -256,12 +261,18 @@ function Layout(mw,mh){
     this.maxWidth=mw;
     this.maxHeight=mh;
     this.padding=10;
-
-    this.flowLeft=function(drawables){
-        var x=1,y=1;
-
-        for(var idx in drawables){
-            var item=drawables[idx];
+    this._drawables=[];
+    this.add=function(drawable){
+        if(drawable instanceof Drawable){
+            this._drawables.push(drawable);
+        }else{
+            console.log(drawable,'is not a drawable')
+        }
+    }
+    this.flowLeft=function(){
+        var x=this.padding,y=this.padding;
+        for(var idx in this._drawables){
+            var item=this._drawables[idx];
             if(item instanceof Drawable){
 
                 item.position(x,y);
@@ -269,7 +280,7 @@ function Layout(mw,mh){
                 
                 if(x+item.width()>=this.maxWidth){
                     y+=item.height()+this.padding;
-                    x=1;
+                    x=this.padding;
                 }
                 
             }
