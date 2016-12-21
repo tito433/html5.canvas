@@ -99,19 +99,17 @@ function Canvas(dom){
 
     //mouse events
     this._onClick=function(evt){
-        var x=evt.clientX - this.bounds.left,
-            y=evt.clientY - this.bounds.top;
-        for(var idx in this._elemDr){
+        var x=evt.clientX - this.bounds.left, y=evt.clientY - this.bounds.top;
+        for(var idx=0,ln=this._elemDr.length;idx<ln;idx++){
             var dr=this._elemDr[idx];
-
-            if(dr.vision(x,y) && typeof dr.onClick==='function'){
-                dr.onClick(x,y);
-                dr.draw(this._ctx);
+            if(typeof dr.onClick==='function' && dr.vision(x,y)){
+                dr.onClick.call(dr,this._ctx);
+                break;//fcfs
             }
         }
     }
-    canvas.addEventListener("mouseup", this._onClick.bind(this), false);
-    canvas.addEventListener("touchend", this._onClick.bind(this), false);
+    canvas.addEventListener("mouseup", this._onClick.bind(this), true);
+    canvas.addEventListener("touchend", this._onClick.bind(this), true);
 
 }
 
@@ -153,14 +151,14 @@ var Drawable=function() {
         }
         return this;
     }
-    this.position=function(x,y){
-        if(undefined==x){
-            return {x:this.x,y:this.y};
-        }else if(undefined!=x && undefined!=y){
-            this.x=x;
-            this.y=y;
+    this.position=function(){
+        if(arguments.length){
+            this.x=arguments[0]||0;
+            this.y=arguments.length>1? arguments[1]||0:0;
+            return this;
+        }else{
+            return new Point(this.x,this.y);
         }
-        return this;
     }
     this.vision=function(x,y){
          var m = {x: x, y: y};
@@ -213,6 +211,18 @@ Drawable.prototype.draw=function(ctx){
 function Point(x,y){
     this.x=x;
     this.y=y;
+    this.hitTest=function(point1,point2){
+        var dxc = this.x - point1.x,
+            dyc = this.y - point1.y,
+            dxl = point2.x - point1.x,
+            dyl = point2.y - point1.y,
+            cross = dxc * dyl - dyc * dxl;
+        if (cross != 0) return false;
+        if (Math.abs(dxl) >= Math.abs(dyl))
+          return dxl > 0 ? point1.x <= this.x && this.x <= point2.x : point2.x <= this.x && this.x <= point1.x;
+        else
+          return dyl > 0 ? point1.y <= this.y && this.y <= point2.y : point2.y <= this.y && this.y <= point1.y;
+    }
 }
 
 function Line(){
