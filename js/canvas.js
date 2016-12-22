@@ -103,7 +103,7 @@ function Canvas(dom){
         for(var idx=0,ln=this._elemDr.length;idx<ln;idx++){
             var dr=this._elemDr[idx];
             if(typeof dr.onClick==='function' && dr.vision(x,y)){
-                dr.onClick.call(dr,this._ctx);
+                dr.onClick.call(dr,this._ctx,x,y);
                 break;//fcfs
             }
         }
@@ -224,6 +224,33 @@ function Point(x,y){
           return dyl > 0 ? point1.y <= this.y && this.y <= point2.y : point2.y <= this.y && this.y <= point1.y;
     }
 }
+
+function Cirle(){
+    Drawable.call(this);
+
+    this.fillStyle='';
+    this.strokeStyle="#443";
+    this.lineWidth=1;
+    this.radius=0;
+
+    this.draw=function(ctx){
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle=this.fillStyle;
+        ctx.strokeStyle=this.strokeStyle;
+        ctx.lineWidth=this.lineWidth;
+        ctx.arc(this.x,this.y,this.radius,0,2*Math.PI);
+        if(this.fillStyle){
+            ctx.fill();
+        }
+        
+        ctx.stroke();
+        ctx.restore();
+    }
+
+}
+Cirle.prototype = Object.create(Drawable.prototype);
+Cirle.prototype.constructor = Cirle;
 
 function Line(){
     Drawable.call(this);
