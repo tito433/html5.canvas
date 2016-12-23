@@ -323,4 +323,7 @@ function Layout(mw,mh){
             }
         }
     }
+    this.clear=function(){
+        this._drawables=[];
+    }
 }
