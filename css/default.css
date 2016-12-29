@@ -199,16 +199,3 @@ fieldset buttongroup button{
 .tgl:checked + label {
   background: #aaa;
 }
-
-/*plugin class??*/
-#authorize-div{
-  position: absolute;
-  width: 90%;
-  max-width: 270px;
-  left: 50%;
-  margin-left: -25%;
-  padding: 10px;
-  top: 10%;
-  background: #fff;
-  border: 1px solid #ccc;
-}
