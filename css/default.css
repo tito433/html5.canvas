@@ -199,3 +199,8 @@ fieldset buttongroup button{
 .tgl:checked + label {
   background: #aaa;
 }
+.view input[type="submit"] {
+
+    width: 25%;
+    display: inline-block;
+}
