@@ -279,11 +279,11 @@ function Cirle() {
 Cirle.prototype = Object.create(Drawable.prototype);
 Cirle.prototype.constructor = Cirle;
 
-function Line() {
+function Line(lineWidth) {
 	Drawable.call(this);
 
 	this.fillStyle = "#f0f0f0";
-	this.lineWidth = 1;
+	this.lineWidth = lineWidth || 1;
 	this.draw = function(ctx) {
 		ctx.save();
 		Drawable.prototype.draw.call(this, ctx);
@@ -350,19 +350,22 @@ function Layout(mw, mh) {
 		}
 	}
 	this.table = function(colCount) {
-		var aw = this.maxWidth / colCount,
-			w = aw - 2 * this.padding,
-			h = aw - 2 * this.padding,
-			x = this.padding,
-			y = this.padding;
+		var aw = this.maxWidth - (colCount + 1) * this.padding,
+			ah = this.maxHeight - (colCount + 1) * this.padding,
+			rc = Math.ceil(this._drawables.length / colCount),
+			w = Math.floor(aw / colCount),
+			h = Math.floor(ah / rc),
+			x = 0,
+			y = 0;
+
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
 			if (item instanceof Drawable) {
-				item.position(x + this.padding, y).size(w, h);
-				x += aw;
+				item.position(x + this.padding, y + this.padding).size(w, h);
+				x += w + this.padding;
 				if ((i + 1) % colCount == 0) {
-					y += aw;
-					x = this.padding;
+					y += h + this.padding;
+					x = 0;
 				}
 
 			}
