@@ -110,11 +110,19 @@ function Canvas(dom) {
 			}
 		}
 	}
+
 	canvas.addEventListener("mouseup", this._onClick.bind(this), true);
 	canvas.addEventListener("touchend", this._onClick.bind(this), true);
 
+	this.onZoom = function() {};
+	canvas.addEventListener("mousewheel", function(event) {
+		event.preventDefault();
+		var mousex = event.clientX - canvas.offsetLeft;
+		var mousey = event.clientY - canvas.offsetTop;
+		var zoom = event.wheelDelta / 120;
+		this.onZoom.call(this, zoom);
+	}.bind(this), true);
 }
-
 
 var Drawable = function() {
 
@@ -355,16 +363,14 @@ function Layout(mw, mh) {
 	}
 	this.table = function(colCount) {
 		var aw = this.maxWidth - (colCount + 1) * this.padding,
-			ah = this.maxHeight - (colCount + 1) * this.padding,
-			rc = Math.ceil(this._drawables.length / colCount),
 			w = Math.floor(aw / colCount),
-			h = Math.floor(ah / rc),
 			x = this.margin.x,
-		y = this.margin.y;
+			y = this.margin.y;
 
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
 			if (item instanceof Drawable) {
+				h = item.height();
 				item.position(x + this.padding, y + this.padding).size(w, h);
 				x += w + this.padding;
 				if ((i + 1) % colCount == 0) {
