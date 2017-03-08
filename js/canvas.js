@@ -323,6 +323,10 @@ function Layout(mw, mh) {
 	this.maxWidth = mw;
 	this.maxHeight = mh;
 	this.padding = 10;
+	this.margin = {
+		x: 0,
+		y: 0
+	};
 	this._drawables = [];
 	this.add = function(drawable) {
 		if (drawable instanceof Drawable) {
@@ -355,8 +359,8 @@ function Layout(mw, mh) {
 			rc = Math.ceil(this._drawables.length / colCount),
 			w = Math.floor(aw / colCount),
 			h = Math.floor(ah / rc),
-			x = 0,
-			y = 0;
+			x = this.margin.x,
+		y = this.margin.y;
 
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
