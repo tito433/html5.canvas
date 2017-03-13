@@ -78,9 +78,16 @@ function Canvas(dom) {
 	}
 	this.draw = function() {
 		this._ctx.clearRect(0, 0, this.width, this.height);
-		if (this._elemDr.length) {
-			for (var i = 0, ln = this._elemDr.length; i < ln; i++) {
-				this._elemDr[i].draw(this._ctx);
+		var elems = this._elemDr;
+		if (arguments.length > 0 && arguments[0] instanceof Array) {
+			elems = arguments[0];
+		}
+
+		if (elems.length) {
+			for (var i = 0, ln = elems.length; i < ln; i++) {
+				if (elems[i] instanceof Drawable) {
+					elems[i].draw(this._ctx);
+				}
 			}
 		}
 	};
