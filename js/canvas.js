@@ -377,7 +377,7 @@ function Layout(mw, mh) {
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
 			if (item instanceof Drawable) {
-				h = item.height();
+				h = item.height() == 0 ? this.maxHeight : item.height();
 				item.position(x + this.padding, y + this.padding).size(w, h);
 				x += w + this.padding;
 				if ((i + 1) % colCount == 0) {
