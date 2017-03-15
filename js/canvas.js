@@ -51,10 +51,13 @@ function Canvas(dom) {
 	}
 
 	this.bounds = canvas.getBoundingClientRect();
+	this.x = 0;
+	this.y = 0;
 	this.width = canvas.width;
 	this.height = canvas.height;
 	this._timer = false;
-
+	this._mosueDown = false;
+	this._mosueDown = false;
 
 	this._ctx = canvas.getContext("2d");
 	this._elemDr = [];
@@ -77,13 +80,14 @@ function Canvas(dom) {
 		return false;
 	}
 	this.draw = function() {
-		this._ctx.clearRect(0, 0, this.width, this.height);
+
 		var elems = this._elemDr;
 		if (arguments.length > 0 && arguments[0] instanceof Array) {
 			elems = arguments[0];
 		}
 
 		if (elems.length) {
+			this._ctx.clearRect(0, 0, this.width, this.height);
 			for (var i = 0, ln = elems.length; i < ln; i++) {
 				if (elems[i] instanceof Drawable) {
 					elems[i].draw(this._ctx);
@@ -105,21 +109,34 @@ function Canvas(dom) {
 		}
 	}
 
-	//mouse events
-	this._onClick = function(evt) {
-		var x = evt.clientX - this.bounds.left,
-			y = evt.clientY - this.bounds.top;
-		for (var idx = 0, ln = this._elemDr.length; idx < ln; idx++) {
-			var dr = this._elemDr[idx];
-			if (typeof dr.onClick === 'function' && dr.vision(x, y)) {
-				dr.onClick.call(dr, this._ctx, x, y);
-				break; //fcfs
+	this._onDrag = function(e) {
+		if (this._mosueDown) {
+			var dx = this._mosueDown.x - e.clientX,
+				dy = this._mosueDown.y - e.clientY;
+			for (var i in this._elemDr) {
+				var r = this._elemDr[i];
+				r.position(r.x - dx, r.y - dy);
 			}
-		}
-	}
 
-	canvas.addEventListener("mouseup", this._onClick.bind(this), true);
-	canvas.addEventListener("touchend", this._onClick.bind(this), true);
+			this.draw();
+			this._mosueDown = {
+				x: e.clientX,
+				y: e.clientY
+			};
+
+		}
+	};
+	canvas.addEventListener("mousedown", function(e) {
+		this._mosueDown = {
+			x: e.clientX,
+			y: e.clientY
+		};
+	}.bind(this), true);
+	canvas.addEventListener("mouseup", function() {
+		this._mosueDown = false;
+	}.bind(this), true);
+	canvas.addEventListener("mousemove", this._onDrag.bind(this), true);
+
 
 	this.onZoom = function() {};
 	canvas.addEventListener("mousewheel", function(event) {
@@ -377,7 +394,7 @@ function Layout(mw, mh) {
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
 			if (item instanceof Drawable) {
-				h = item.height() == 0 ? this.maxHeight : item.height();
+				h = item.height() == 0 ? this.maxHeight - 2 * this.padding : item.height();
 				item.position(x + this.padding, y + this.padding).size(w, h);
 				x += w + this.padding;
 				if ((i + 1) % colCount == 0) {
