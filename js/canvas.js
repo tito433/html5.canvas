@@ -131,11 +131,11 @@ function Canvas(dom) {
 			x: e.clientX,
 			y: e.clientY
 		};
-	}.bind(this), true);
+	}.bind(this), false);
 	canvas.addEventListener("mouseup", function() {
 		this._mosueDown = false;
-	}.bind(this), true);
-	canvas.addEventListener("mousemove", this._onDrag.bind(this), true);
+	}.bind(this), false);
+	canvas.addEventListener("mousemove", this._onDrag.bind(this), false);
 
 
 	this.onZoom = function() {};
