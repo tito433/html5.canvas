@@ -117,7 +117,9 @@ function Canvas(dom) {
 				var r = this._elemDr[i];
 				r.position(r.x - dx, r.y - dy);
 			}
-
+			if (this.onDrag && typeof this.onDrag == 'function') {
+				this.onDrag(dx, dy);
+			}
 			this.draw();
 			this._mosueDown = {
 				x: e.clientX,
