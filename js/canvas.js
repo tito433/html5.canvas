@@ -95,6 +95,33 @@ function Canvas(dom) {
 			}
 		}
 	};
+	this.drawPoint = function(x, y, size, color, gradient) {
+		var ctx = this._ctx;
+		ctx.save();
+		ctx.beginPath();
+		ctx.fillStyle = color;
+		ctx.arc(x, y, size, 0, 2 * Math.PI, true);
+		ctx.fill();
+		ctx.restore();
+
+		if (gradient != undefined) {
+			var reflection = size / 4;
+
+			ctx.save();
+			ctx.translate(x, y);
+			var radgrad = ctx.createRadialGradient(-reflection, -reflection, reflection, 0, 0, size);
+
+			radgrad.addColorStop(0, '#FFFFFF');
+			radgrad.addColorStop(gradient, color);
+			radgrad.addColorStop(1, 'rgba(1,159,98,0)');
+
+			ctx.fillStyle = radgrad;
+			ctx.fillRect(-size, -size, size * 2, size * 2);
+			ctx.restore();
+
+		}
+
+	};
 	this.clear = function() {
 		this._elemDr = [];
 		this._elemDr.length = 0;
