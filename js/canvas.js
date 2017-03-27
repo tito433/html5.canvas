@@ -65,6 +65,8 @@ function Canvas(dom) {
 	this.add = function(dr) {
 		if (dr instanceof Drawable) {
 			this._elemDr.push(dr);
+		} else {
+			console.log(dr, 'is not a drawable?')
 		}
 		return this;
 	}
@@ -85,12 +87,13 @@ function Canvas(dom) {
 		if (arguments.length > 0 && arguments[0] instanceof Array) {
 			elems = arguments[0];
 		}
-
 		if (elems.length) {
 			this._ctx.clearRect(0, 0, this.width, this.height);
 			for (var i = 0, ln = elems.length; i < ln; i++) {
-				if (elems[i] instanceof Drawable) {
+				if (typeof elems[i].draw === "function") {
 					elems[i].draw(this._ctx);
+				} else {
+					console.log("Invalid drawser?", elems[i])
 				}
 			}
 		}
@@ -169,12 +172,33 @@ function Canvas(dom) {
 
 	this.onZoom = function() {};
 	canvas.addEventListener("mousewheel", function(event) {
-		event.preventDefault();
-		var mousex = event.clientX - canvas.offsetLeft;
-		var mousey = event.clientY - canvas.offsetTop;
-		var zoom = event.wheelDelta / 120;
-		this.onZoom.call(this, zoom);
-	}.bind(this), true);
+		var delta = 0;
+		if (!event) /* For IE. */
+			event = window.event;
+		if (event.wheelDelta) { /* IE/Opera. */
+			delta = event.wheelDelta / 120;
+		} else if (event.detail) { /** Mozilla case. */
+			/** In Mozilla, sign of delta is different than in IE.
+			 * Also, delta is multiple of 3.
+			 */
+			delta = -event.detail / 3;
+		}
+		/** If delta is nonzero, handle it.
+		 * Basically, delta is now positive if wheel was scrolled up,
+		 * and negative, if wheel was scrolled down.
+		 */
+		if (delta)
+			this.onZoom.call(this, delta);
+		/** Prevent default actions caused by mouse wheel.
+		 * That might be ugly, but we handle scrolls somehow
+		 * anyway, so don't bother here..
+		 */
+		if (event.preventDefault)
+			event.preventDefault();
+		event.returnValue = false;
+
+
+	}.bind(this), false);
 }
 
 var Drawable = function() {
@@ -272,28 +296,15 @@ var Drawable = function() {
 		return 0 <= dotABAM && dotABAM <= dotABAB && 0 <= dotBCBM && dotBCBM <= dotBCBC;
 
 	}
-}
-Drawable.prototype.draw = function(ctx) {
-	if (this.label) {
-		ctx.textBaseline = "top";
-		ctx.font = this.fontSize + 'px ' + this.fontName;
-		ctx.fillStyle = this.fontColor;
-		ctx.textBaseline = "middle";
+	this.draw = function(ctx) {
+		ctx.save();
+		ctx.font = "20px Georgia";
 		ctx.textAlign = "center";
-		var lines = [].concat(this.label),
-			eh = ctx.measureText('M').width,
-			x = this.x + this.w / 2,
-			y = this.y + eh / 2,
-			th = (lines.length * eh);
+		ctx.fillStyle = 'red';
+		ctx.fillText(this.getName() + ' draw function not overriden!', this.x, this.y);
+		ctx.restore();
 
-		y += this.h / 2 - th / 2;
-		//i only accept arr.
-		for (var i = 0, ln = lines.length; i < ln; i++) {
-			ctx.fillText(lines[i], x, y);
-			y += eh;
-		}
 	}
-
 }
 
 function Point(x, y) {
