@@ -199,6 +199,7 @@ function Canvas(dom) {
 
 
 	}.bind(this), false);
+	this.canvas = canvas;
 }
 
 var Drawable = function() {
@@ -439,7 +440,7 @@ function Layout(mw, mh) {
 				x += w + this.padding;
 				if ((i + 1) % colCount == 0) {
 					y += h + this.padding;
-					x = 0;
+					x = this.margin.x;
 				}
 
 			}
