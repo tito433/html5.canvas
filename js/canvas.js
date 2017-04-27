@@ -27,37 +27,34 @@ function Canvas(dom) {
 		parent = document.querySelector(dom);
 		if (!parent) parent = document.body;
 	}
-	var canvas = false;
 	if (parent instanceof HTMLCanvasElement) {
 		canvas = parent;
-	} else {
-		//do we have?
-		canvas = parent.querySelector('canvas');
-		if (!canvas) {
-			//we append
-			canvas = document.createElement('canvas');
+	} else if (parent instanceof HTMLElement) {
+		canvas = parent.getElementsByTagName('CANVAS');
 
+		if (!canvas.length) {
+			canvas = document.createElement('canvas');
+			parent.appendChild(canvas);
 			var ppl = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-left')),
 				ppr = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-right')),
 				ppt = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-top')),
-				ppb = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-bottom')),
-				width = parent.clientWidth - ppl - ppr,
-				height = parent.clientHeight - ppt - ppb;
+				ppb = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-bottom'));
 
-			parent.appendChild(canvas);
-			canvas.width = width;
-			canvas.height = height;
+			canvas.width = parent.clientWidth - ppl - ppr;
+			canvas.height = parent.clientHeight - ppt - ppb;
+		} else {
+			canvas = canvas[0];
 		}
 	}
-
+	this.width = canvas.width;
+	this.height = canvas.height;
 	this.bounds = canvas.getBoundingClientRect();
 	this.x = 0;
 	this.y = 0;
-	this.width = canvas.width;
-	this.height = canvas.height;
 	this._timer = false;
 	this._mosueDown = false;
 	this._mosueDown = false;
+
 
 	this._ctx = canvas.getContext("2d");
 	this._elemDr = [];
@@ -70,7 +67,7 @@ function Canvas(dom) {
 		}
 		return this;
 	}
-	this.rem = function(drawable) {
+	this.remove = function(drawable) {
 		if (drawable instanceof Drawable && this._elemDr.length) {
 			for (var i = this._elemDr.length - 1; i >= 0; i--) {
 				if (this._elemDr[i] == drawable) {
@@ -98,33 +95,7 @@ function Canvas(dom) {
 			}
 		}
 	};
-	this.drawPoint = function(x, y, size, color, gradient) {
-		var ctx = this._ctx;
-		ctx.save();
-		ctx.beginPath();
-		ctx.fillStyle = color;
-		ctx.arc(x, y, size, 0, 2 * Math.PI, true);
-		ctx.fill();
-		ctx.restore();
 
-		if (gradient != undefined) {
-			var reflection = size / 4;
-
-			ctx.save();
-			ctx.translate(x, y);
-			var radgrad = ctx.createRadialGradient(-reflection, -reflection, reflection, 0, 0, size);
-
-			radgrad.addColorStop(0, '#FFFFFF');
-			radgrad.addColorStop(gradient, color);
-			radgrad.addColorStop(1, 'rgba(1,159,98,0)');
-
-			ctx.fillStyle = radgrad;
-			ctx.fillRect(-size, -size, size * 2, size * 2);
-			ctx.restore();
-
-		}
-
-	};
 	this.clear = function() {
 		this._elemDr = [];
 		this._elemDr.length = 0;
@@ -158,12 +129,15 @@ function Canvas(dom) {
 
 		}
 	};
+
 	canvas.addEventListener("mousedown", function(e) {
 		this._mosueDown = {
 			x: e.clientX,
 			y: e.clientY
 		};
 	}.bind(this), false);
+
+
 	canvas.addEventListener("mouseup", function() {
 		this._mosueDown = false;
 	}.bind(this), false);
@@ -200,6 +174,14 @@ function Canvas(dom) {
 
 	}.bind(this), false);
 	this.canvas = canvas;
+
+	this.animate = function() {
+		drawLoop = function() {
+			requestAnimationFrame(drawLoop);
+			this.draw();
+		}.bind(this);
+		drawLoop();
+	}
 }
 
 var Drawable = function() {
@@ -426,16 +408,18 @@ function Layout(mw, mh) {
 			}
 		}
 	}
-	this.table = function(colCount) {
+	this.table = function(colCount, rowCount) {
+		rowCount = rowCount === undefined ? 1 : rowCount;
 		var aw = this.maxWidth - (colCount + 1) * this.padding,
 			w = Math.floor(aw / colCount),
 			x = this.margin.x,
-			y = this.margin.y;
+			y = this.margin.y,
+			dh = Math.min(w, (this.maxHeight - 2 * this.padding) / rowCount);
 
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
 			if (item instanceof Drawable) {
-				h = item.height() == 0 ? this.maxHeight - 2 * this.padding : item.height();
+				h = item.height() == 0 ? dh : item.height();
 				item.position(x + this.padding, y + this.padding).size(w, h);
 				x += w + this.padding;
 				if ((i + 1) % colCount == 0) {
