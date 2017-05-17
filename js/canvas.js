@@ -22,6 +22,7 @@ function Canvas(dom) {
 	var parent = dom,
 		canvas = false;
 
+	this._animate = false;
 
 	if (typeof dom === 'string') {
 		parent = document.querySelector(dom);
@@ -79,18 +80,17 @@ function Canvas(dom) {
 		return false;
 	}
 	this.draw = function() {
-
+		console.log('drawing: ' + this.getName());
+		this._ctx.clearRect(0, 0, this.width, this.height);
 		var elems = this._elemDr;
 		if (arguments.length > 0 && arguments[0] instanceof Array) {
 			elems = arguments[0];
 		}
 		if (elems.length) {
-			this._ctx.clearRect(0, 0, this.width, this.height);
+
 			for (var i = 0, ln = elems.length; i < ln; i++) {
 				if (typeof elems[i].draw === "function") {
 					elems[i].draw(this._ctx);
-				} else {
-					console.log("Invalid drawser?", elems[i])
 				}
 			}
 		}
@@ -99,50 +99,7 @@ function Canvas(dom) {
 	this.clear = function() {
 		this._elemDr = [];
 		this._elemDr.length = 0;
-		this._ctx.clearRect(0, 0, this.width, this.height);
 	}
-
-	this.animate = function(interval) {
-		interval = undefined == interval ? 1000 / 60 : interval;
-		clearInterval(this._timer);
-		if (interval) {
-			this._timer = setInterval(this.draw.bind(this), interval);
-		}
-	}
-
-	this._onDrag = function(e) {
-		if (this._mosueDown) {
-			var dx = this._mosueDown.x - e.clientX,
-				dy = this._mosueDown.y - e.clientY;
-			for (var i in this._elemDr) {
-				var r = this._elemDr[i];
-				r.position(r.x - dx, r.y - dy);
-			}
-			if (this.onDrag && typeof this.onDrag == 'function') {
-				this.onDrag(dx, dy);
-			}
-			this.draw();
-			this._mosueDown = {
-				x: e.clientX,
-				y: e.clientY
-			};
-
-		}
-	};
-
-	canvas.addEventListener("mousedown", function(e) {
-		this._mosueDown = {
-			x: e.clientX,
-			y: e.clientY
-		};
-	}.bind(this), false);
-
-
-	canvas.addEventListener("mouseup", function() {
-		this._mosueDown = false;
-	}.bind(this), false);
-	canvas.addEventListener("mousemove", this._onDrag.bind(this), false);
-
 
 	this.onZoom = function() {};
 	canvas.addEventListener("mousewheel", function(event) {
@@ -173,15 +130,8 @@ function Canvas(dom) {
 
 
 	}.bind(this), false);
-	this.canvas = canvas;
 
-	this.animate = function() {
-		drawLoop = function() {
-			requestAnimationFrame(drawLoop);
-			this.draw();
-		}.bind(this);
-		drawLoop();
-	}
+	setInterval(this.draw.bind(this), 1000);
 }
 
 var Drawable = function() {
