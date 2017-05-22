@@ -47,6 +47,7 @@ function Canvas(dom) {
 			canvas = canvas[0];
 		}
 	}
+
 	this.width = canvas.width;
 	this.height = canvas.height;
 	this.bounds = canvas.getBoundingClientRect();
@@ -63,6 +64,7 @@ function Canvas(dom) {
 	this.add = function(dr) {
 		if (dr instanceof Drawable) {
 			this._elemDr.push(dr);
+			dr.draw(this._ctx);
 		} else {
 			console.log(dr, 'is not a drawable?')
 		}
@@ -80,7 +82,6 @@ function Canvas(dom) {
 		return false;
 	}
 	this.draw = function() {
-		console.log('drawing: ' + this.getName());
 		this._ctx.clearRect(0, 0, this.width, this.height);
 		var elems = this._elemDr;
 		if (arguments.length > 0 && arguments[0] instanceof Array) {
@@ -131,7 +132,11 @@ function Canvas(dom) {
 
 	}.bind(this), false);
 
-	setInterval(this.draw.bind(this), 1000);
+	// setInterval(this.draw.bind(this), 1000);
+
+	this.saveAsPng = function() {
+		window.open(canvas.toDataURL("image/png"), '_blank');
+	}
 }
 
 var Drawable = function() {
@@ -291,7 +296,6 @@ function Line(lineWidth) {
 	this.lineWidth = lineWidth || 1;
 	this.draw = function(ctx) {
 		ctx.save();
-		Drawable.prototype.draw.call(this, ctx);
 		ctx.beginPath();
 		ctx.fillStyle = this.fillStyle;
 		ctx.lineWidth = this.lineWidth;
@@ -384,4 +388,16 @@ function Layout(mw, mh) {
 	this.clear = function() {
 		this._drawables = [];
 	}
+	this.draw = function(ctx) {
+		ctx.clearRect(0, 0, this.maxWidth, this.maxHeight);
+		for (var idx in this._drawables) {
+			var item = this._drawables[idx];
+			if (item instanceof Drawable) {
+				item.draw(ctx);
+			}
+		}
+	}
 }
+
+Layout.prototype = Object.create(Drawable.prototype);
+Layout.prototype.constructor = Layout;
