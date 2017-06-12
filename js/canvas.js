@@ -62,44 +62,32 @@ function Canvas(dom) {
 	this._elemDr = [];
 
 	this.add = function(dr) {
-		if (dr instanceof Drawable) {
-			this._elemDr.push(dr);
-			dr.draw(this._ctx);
-		} else {
-			console.log(dr, 'is not a drawable?')
+		if (dr) {
+			if (typeof dr.draw === "function") {
+				dr.draw(this._ctx);
+			}
 		}
 		return this;
 	}
-	this.remove = function(drawable) {
-		if (drawable instanceof Drawable && this._elemDr.length) {
-			for (var i = this._elemDr.length - 1; i >= 0; i--) {
-				if (this._elemDr[i] == drawable) {
-					this._elemDr.splice(i, 1);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	this.draw = function() {
-		this._ctx.clearRect(0, 0, this.width, this.height);
-		var elems = this._elemDr;
-		if (arguments.length > 0 && arguments[0] instanceof Array) {
-			elems = arguments[0];
-		}
-		if (elems.length) {
 
-			for (var i = 0, ln = elems.length; i < ln; i++) {
-				if (typeof elems[i].draw === "function") {
-					elems[i].draw(this._ctx);
-				}
-			}
-		}
-	};
+	// this.draw = function() {
+	// 	this._ctx.clearRect(0, 0, this.width, this.height);
+	// 	// var elems = this._elemDr;
+	// 	// if (arguments.length > 0 && arguments[0] instanceof Array) {
+	// 	// 	elems = arguments[0];
+	// 	// }
+	// 	// if (elems.length) {
+
+	// 	// 	for (var i = 0, ln = elems.length; i < ln; i++) {
+	// 	// 		if (typeof elems[i].draw === "function") {
+	// 	// 			elems[i].draw(this._ctx);
+	// 	// 		}
+	// 	// 	}
+	// 	// }
+	// };
 
 	this.clear = function() {
-		this._elemDr = [];
-		this._elemDr.length = 0;
+		this._ctx.clearRect(0, 0, this.width, this.height);
 	}
 
 	this.onZoom = function() {};
@@ -401,3 +389,63 @@ function Layout(mw, mh) {
 
 Layout.prototype = Object.create(Drawable.prototype);
 Layout.prototype.constructor = Layout;
+
+function Grid(size) {
+	Drawable.call(this);
+	this._bl_size = size;
+	this.draw = function(ctx) {
+		// var img = ctx.getImageData();
+		ctx.save();
+		ctx.translate(0.5, 0.5);
+		var w = ctx.canvas.width,
+			h = ctx.canvas.height,
+			block = h / this._bl_size;
+
+		ctx.fillStyle = '#000';
+		ctx.fillRect(0, 0, w, h);
+		ctx.font = '24px serif';
+		ctx.textAlign = 'center';
+		ctx.fillStyle = '#FFF';
+		var si = this.nx;
+		// while (i < w) {
+		// 	ctx.strokeStyle = (si == 0) ? '#fff' : '#6192A4';
+		// 	ctx.lineWidth = (si == 0) ? 3 : 2;
+		// 	ctx.beginPath();
+		// 	ctx.moveTo(i + 0.5, 0.5);
+		// 	ctx.lineTo(i + 0.5, h + 0.5);
+		// 	ctx.closePath();
+		// 	ctx.stroke();
+
+		// 	if (si % 3 == 0)
+		// 		ctx.fillText(si, i, h / 2);
+		// 	si++;
+		// 	i += block;
+		// }
+
+		ctx.strokeStyle = '#6192A4';
+		ctx.lineWidth = 2;
+		ctx.textBaseline = "middle";
+		var ny = Math.round(h / block);
+		for (var i = 0; i < ny; i++) {
+			ctx.beginPath();
+			var y = i * block + 0.5;
+			ctx.moveTo(0.5, y);
+			ctx.lineTo(w - 0.5, y);
+			ctx.stroke();
+			ctx.fillText(ny - i, block, y);
+		}
+		for (var i = 0, nx = Math.round(w / block); i < nx; i++) {
+			ctx.beginPath();
+			var x = i * block + 0.5;
+			ctx.moveTo(x, 0.5);
+			ctx.lineTo(x, h);
+			ctx.stroke();
+			ctx.fillText(i, x, (ny - 1) * block);
+		}
+
+		ctx.restore();
+
+	}
+}
+Grid.prototype = Object.create(Drawable.prototype);
+Grid.prototype.constructor = Grid;
