@@ -121,13 +121,12 @@ function Canvas(dom) {
 	}.bind(this), false);
 
 	// setInterval(this.draw.bind(this), 1000);
-
 	this.saveAsPng = function() {
 		window.open(canvas.toDataURL("image/png"), '_blank');
 	}
 }
 
-var Drawable = function() {
+function Drawable() {
 
 	this.x = 0;
 	this.y = 0;
@@ -177,51 +176,6 @@ var Drawable = function() {
 			return new Point(this.x, this.y);
 		}
 	}
-	this.vision = function(x, y) {
-		var m = {
-			x: x,
-			y: y
-		};
-
-		var vector = function vector(p1, p2) {
-			return {
-				x: (p2.x - p1.x),
-				y: (p2.y - p1.y)
-			};
-		};
-		var dot = function(u, v) {
-			return u.x * v.x + u.y * v.y;
-		};
-		var r = {
-			A: {
-				x: this.x,
-				y: this.y
-			},
-			B: {
-				x: this.x + this.w,
-				y: this.y
-			},
-			C: {
-				x: this.x + this.w,
-				y: this.y + this.h
-			},
-			D: {
-				x: this.x,
-				y: this.y + this.h
-			}
-		};
-
-		var AB = vector(r.A, r.B);
-		var AM = vector(r.A, m);
-		var BC = vector(r.B, r.C);
-		var BM = vector(r.B, m);
-		var dotABAM = dot(AB, AM);
-		var dotABAB = dot(AB, AB);
-		var dotBCBM = dot(BC, BM);
-		var dotBCBC = dot(BC, BC);
-		return 0 <= dotABAM && dotABAM <= dotABAB && 0 <= dotBCBM && dotBCBM <= dotBCBC;
-
-	}
 	this.draw = function(ctx) {
 		ctx.save();
 		ctx.font = "20px Georgia";
@@ -230,6 +184,20 @@ var Drawable = function() {
 		ctx.fillText(this.getName() + ' draw function not overriden!', this.x, this.y);
 		ctx.restore();
 
+	}
+}
+Drawable.prototype.drawLabel = function(ctx, lables, aling) {
+	aling = aling || "center";
+	var fy = ctx.measureText("0").width,
+		pad = "center" === aling ? this.width() / 2 : 0;
+	ctx.textAlign = aling;
+	ctx.textBaseline = "middle";
+	lables = lables instanceof Array ? lables : [lables];
+	var y = (this.h - (lables.length * fy)) / 2;
+	for (var i = 0, ln = lables.length; i < ln; i++) {
+		ctx.save();
+		ctx.fillText(lables[i], this.x + pad, this.y + y, this.w);
+		y += fy;
 	}
 }
 
