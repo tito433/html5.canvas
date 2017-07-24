@@ -70,21 +70,11 @@ function Canvas(dom) {
 		return this;
 	}
 
-	// this.draw = function() {
-	// 	this._ctx.clearRect(0, 0, this.width, this.height);
-	// 	// var elems = this._elemDr;
-	// 	// if (arguments.length > 0 && arguments[0] instanceof Array) {
-	// 	// 	elems = arguments[0];
-	// 	// }
-	// 	// if (elems.length) {
-
-	// 	// 	for (var i = 0, ln = elems.length; i < ln; i++) {
-	// 	// 		if (typeof elems[i].draw === "function") {
-	// 	// 			elems[i].draw(this._ctx);
-	// 	// 		}
-	// 	// 	}
-	// 	// }
-	// };
+	this.draw = function(drawable) {
+		if (drawable && drawable instanceof Drawable) {
+			drawable.draw(this._ctx);
+		}
+	};
 
 	this.clear = function() {
 		this._ctx.clearRect(0, 0, this.width, this.height);
@@ -284,10 +274,15 @@ Rectangle.prototype.constructor = Rectangle;
 
 
 
-function Layout(mw, mh) {
-	this.maxWidth = mw;
-	this.maxHeight = mh;
+function Layout(typeName) {
+	this.typeName = typeName;
+	this.maxWidth = 0;
+	this.maxHeight = 0;
 	this.padding = 10;
+	this._table_config = {
+		col: 4,
+		row: 1
+	};
 	this.margin = {
 		x: 0,
 		y: 0
@@ -301,6 +296,9 @@ function Layout(mw, mh) {
 		}
 	}
 	this.flowLeft = function() {
+		this.typeName = 'flowLeft';
+	}
+	this.type_fn_flowLeft = function() {
 		var x = this.padding,
 			y = this.padding;
 		for (var idx in this._drawables) {
@@ -318,26 +316,30 @@ function Layout(mw, mh) {
 			}
 		}
 	}
-	this.table = function(colCount, rowCount) {
-		rowCount = rowCount === undefined ? 1 : rowCount;
-		var aw = this.maxWidth - (colCount + 1) * this.padding,
-			w = Math.floor(aw / colCount),
+	this.table = function(col, row) {
+		this.typeName = 'table';
+		this._table_config = {
+			col: col,
+			row: row
+		};
+	}
+	this.type_fn_table = function() {
+		var aw = this.maxWidth - (this._table_config.col + 1) * this.padding,
+			w = Math.floor(aw / this._table_config.col),
 			x = this.margin.x,
 			y = this.margin.y,
-			dh = Math.min(w, (this.maxHeight - 2 * this.padding) / rowCount);
+			dh = Math.min(w, (this.maxHeight - 2 * this.padding) / this._table_config.row);
 
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
 			var item = this._drawables[i];
-			if (item instanceof Drawable) {
-				h = item.height() == 0 ? dh : item.height();
-				item.position(x + this.padding, y + this.padding).size(w, h);
-				x += w + this.padding;
-				if ((i + 1) % colCount == 0) {
-					y += h + this.padding;
-					x = this.margin.x;
-				}
-
+			h = item.height() == 0 ? dh : item.height();
+			item.position(x + this.padding, y + this.padding).size(w, h);
+			x += w + this.padding;
+			if ((i + 1) % this._table_config.col == 0) {
+				y += h + this.padding;
+				x = this.margin.x;
 			}
+
 		}
 
 	}
@@ -345,12 +347,12 @@ function Layout(mw, mh) {
 		this._drawables = [];
 	}
 	this.draw = function(ctx) {
-		ctx.clearRect(0, 0, this.maxWidth, this.maxHeight);
-		for (var idx in this._drawables) {
-			var item = this._drawables[idx];
-			if (item instanceof Drawable) {
-				item.draw(ctx);
-			}
+		this.maxWidth = ctx.width;
+		this.maxHeight = ctx.height;
+		var fn_name = 'type_fn_' + this.typeName;
+		if (typeof this[fn_name] === 'function') this[fn_name]();
+		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
+			this._drawables[i].draw(ctx);
 		}
 	}
 }
