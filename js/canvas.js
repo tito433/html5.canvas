@@ -26,26 +26,28 @@ function Canvas(dom) {
 
 	if (typeof dom === 'string') {
 		parent = document.querySelector(dom);
-		if (!parent) parent = document.body;
 	}
+
 	if (parent instanceof HTMLCanvasElement) {
 		canvas = parent;
-	} else if (parent instanceof HTMLElement) {
-		canvas = parent.getElementsByTagName('CANVAS');
+	} else if (!parent) {
+		parent = document.body;
+	}
 
-		if (!canvas.length) {
-			canvas = document.createElement('canvas');
-			parent.appendChild(canvas);
-			var ppl = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-left')),
-				ppr = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-right')),
-				ppt = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-top')),
-				ppb = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-bottom'));
+	canvas = canvas || parent.getElementsByTagName('CANVAS');
 
-			canvas.width = parent.clientWidth - ppl - ppr;
-			canvas.height = parent.clientHeight - ppt - ppb;
-		} else {
-			canvas = canvas[0];
-		}
+	if (!canvas.length) {
+		canvas = document.createElement('canvas');
+		parent.appendChild(canvas);
+		var ppl = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-left')),
+			ppr = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-right')),
+			ppt = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-top')),
+			ppb = parseInt(window.getComputedStyle(parent, null).getPropertyValue('padding-bottom'));
+
+		canvas.width = parent.clientWidth - ppl - ppr;
+		canvas.height = parent.clientHeight - ppt - ppb;
+	} else {
+		canvas = canvas[0];
 	}
 
 	this.width = canvas.width;
@@ -347,8 +349,8 @@ function Layout(typeName) {
 		this._drawables = [];
 	}
 	this.draw = function(ctx) {
-		this.maxWidth = ctx.width;
-		this.maxHeight = ctx.height;
+		this.maxWidth = ctx.canvas.clientWidth;
+		this.maxHeight = ctx.canvas.clientHeight;
 		var fn_name = 'type_fn_' + this.typeName;
 		if (typeof this[fn_name] === 'function') this[fn_name]();
 		for (var i = 0, ln = this._drawables.length; i < ln; i++) {
